@@ -3,16 +3,19 @@ import './App.css'
 import Axios from 'axios'
 
 function App() {
+  //Setting initial state for the variables 
   const [itemName, setItemName] = useState('')
   const [itemQuantity, setItemQuantity] = useState('')
   const [itemList, setItemList] = useState([])
 
+  //Getting the data from the inventory table to display on the page
   useEffect(() => {
     Axios.get('http://localhost:3001/api/get').then((response) => {
       setItemList(response.data)
     })
   })
 
+  //Saving the data from the inputs for item name and quantity and sending an api request to insert it to the inventory table
   const createItem = (event) => {
     event.preventDefault()
     Axios.post('http://localhost:3001/api/insert', {
@@ -25,6 +28,7 @@ function App() {
     setItemQuantity('')
   }
 
+  //operations on the inventory, posting to the appropriate api's
   const deleteItem = (id) => {
     Axios.delete(`http://localhost:3001/api/delete/${id}`)
   }
@@ -78,6 +82,8 @@ function App() {
           Create
         </button>
       </form>
+
+          {/* Check if the inventory table is empty */}
 
       {itemList.length === 0 ? (
         <h5>Inventory is currently empty.</h5>
