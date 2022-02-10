@@ -28,6 +28,10 @@ function App() {
     Axios.delete(`http://localhost:3001/api/delete/${id}`)
   }
 
+  // const deleteInventory = () => {
+  //   Axios.delete(`http://localhost:3001/api/deleteinventory`)
+  // }
+
   const increment = (id) => {
     Axios.put(`http://localhost:3001/api/update/increment/${id}`)
   }
@@ -37,16 +41,18 @@ function App() {
   }
 
   return (
-    <div className="App">
-      <h1>Inventory Tracking App</h1>
-      <div>Create new item:</div>
-      <form>
+    <div className="container text-center btn-border mt-5">
+      <h1 className="mt-5 text-purple">Inventory Tracking App</h1>
+      <h5>Create new item:</h5>
+      <form className="form d-flex flex-column col-3 mx-auto mb-3">
         <input
           type="text"
           name="itemName"
           onChange={(event) => {
             setItemName(event.target.value)
           }}
+          className="form-control my-1"
+          placeholder="Item Name"
           required
         />
         <input
@@ -55,45 +61,79 @@ function App() {
           onChange={(event) => {
             setItemQuantity(event.target.value)
           }}
+          className="form-control my-1"
+          placeholder="Quantity"
           required
         />
-        <button type="submit" onClick={createItem}>
+        <button
+          type="submit"
+          onClick={createItem}
+          className="btn btn-outline-purple btn-border mt-2"
+        >
           Create
         </button>
       </form>
 
       {itemList.length === 0 ? (
-        <p>Inventory empty</p>
+        <h5>Inventory is currently empty.</h5>
       ) : (
-        <table className="table table-hover ">
-          <thead>
-            <tr>
-              <th>id</th>
-              <th>Name</th>
-              <th>Quantity</th>
-            </tr>
-          </thead>
-          <tbody>
-            {itemList.map((item) => {
-              return (
-                <tr>
-                  <td> {item.id}</td>
-                  <td> {item.title}</td>
-                  <td> {item.quantity}</td>
-                  <td>
-                    <button onClick={() => increment(item.id)}>+</button>
-                  </td>
-                  <td>
-                    <button onClick={() => decrement(item.id)}> - </button>
-                  </td>
-                  <td>
-                    <button onClick={() => deleteItem(item.id)}>Delete</button>
-                  </td>
-                </tr>
-              )
-            })}
-          </tbody>
-        </table>
+        <>
+          <table className="table table-hover table-sm align-middle w-75 mx-auto">
+            <thead>
+              <tr>
+                <th scope="col">id</th>
+                <th scope="col">Name</th>
+                <th scope="col">Quantity</th>
+                <th scope="col">Increment</th>
+                <th scope="col">Decrement</th>
+              </tr>
+            </thead>
+            <tbody>
+              {itemList.map((item) => {
+                return (
+                  <tr>
+                    <td> {item.id}</td>
+                    <td> {item.title}</td>
+                    <td> {item.quantity}</td>
+                    <td>
+                      <button
+                        onClick={() => increment(item.id)}
+                        className="btn btn-small"
+                      >
+                        +
+                      </button>
+                    </td>
+                    <td>
+                      <button
+                        onClick={() => decrement(item.id)}
+                        className="btn btn-small"
+                      >
+                        -
+                      </button>
+                    </td>
+                    <td>
+                      <button
+                        onClick={() => deleteItem(item.id)}
+                        className="btn btn-small btn-outline-danger"
+                      >
+                        Delete
+                      </button>
+                    </td>
+                  </tr>
+                )
+              })}
+            </tbody>
+          </table>
+          {/* <form>
+            <button
+              type="submit"
+              onClick={deleteInventory()}
+              className="btn btn-small btn-outline-danger mt-4 mx-auto"
+            >
+              Delete all inventory
+            </button>
+          </form> */}
+        </>
       )}
     </div>
   )

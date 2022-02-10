@@ -41,6 +41,15 @@ app.delete('/api/delete/:id', (req, res) => {
   })
 })
 
+// delete all inventory
+// app.delete('/api/deleteinventory', (res) => {
+//   const sqlDeleteInventory = `DELETE FROM inventory_table`
+
+//   db.query(sqlDeleteInventory, (error) => {
+//     if (error) console.log(error)
+//   })
+// })
+
 //Increment
 app.put('/api/update/increment/:id', (req, res) => {
   const name = req.params.id
