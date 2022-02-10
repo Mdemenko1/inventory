@@ -44,8 +44,9 @@ Password: (same password as your user have for local host connection in any SQL 
 
 ```
 
-You can access the email notifications here : https://mailtrap.io/signin
-
+You can access the email notifications with the information below: 
+```
+website: https://mailtrap.io/signin
 email: inventoryappctd@gmail.com
 password : codethedream2020
 
