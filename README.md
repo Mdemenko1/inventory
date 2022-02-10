@@ -24,7 +24,7 @@ To install dependencies for windows run:
 ```
 npm run install-all-windows
 ```
-To install dependencies for windows run:
+To install dependencies for mac run:
 ```
 npm run install-all-mac
 ```
