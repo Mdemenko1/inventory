@@ -1,0 +1,24 @@
+{
+  "name": "root",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "server": "npm run server --prefix server",
+    "client": "npm run start --prefix client",
+    "start": "concurrently \"npm run server\" \"npm run client\""
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Mdemenko1/inventory.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Mdemenko1/inventory/issues"
+  },
+  "homepage": "https://github.com/Mdemenko1/inventory#readme",
+  "dependencies": {
+    "concurrently": "^7.0.0"
+  }
+}
