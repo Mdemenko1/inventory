@@ -24,6 +24,13 @@ app.use(cors())
 app.use(express.json())
 app.use(bodyParser.urlencoded({ extended: true }))
 
+app.get('/api/get', (req, res) => {
+  const sqlSelect = 'Select * FROM inventory_table'
+  db.query(sqlSelect, (err, result) => {
+    res.send(result)
+  })
+})
+
 app.post('/api/insert', (req, res) => {
   const itemName = req.body.itemName
   const itemQuantity = req.body.itemQuantity

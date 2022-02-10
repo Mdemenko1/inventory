@@ -6,6 +6,14 @@ function App() {
   const [itemName, setItemName] = useState('')
   const [itemQuantity, setItemQuantity] = useState()
 
+  const [itemList, setItemList] = useState([])
+
+  useEffect(() => {
+    Axios.get('http://localhost:3001/api/get').then((response) => {
+      setItemList(response.data)
+    })
+  })
+
   const createItem = () => {
     Axios.post('http://localhost:3001/api/insert', {
       itemName: itemName,
@@ -26,6 +34,7 @@ function App() {
           onChange={(event) => {
             setItemName(event.target.value)
           }}
+          required
         />
         <input
           type="number"
@@ -33,11 +42,33 @@ function App() {
           onChange={(event) => {
             setItemQuantity(event.target.value)
           }}
+          required
         />
         <button type="submit" onClick={createItem}>
           Create
         </button>
       </form>
+
+      <table className="table table-hover ">
+        <thead>
+          <tr>
+            <th>id</th>
+            <th>Name</th>
+            <th>Quantity</th>
+          </tr>
+        </thead>
+        <tbody>
+          {itemList.map((item) => {
+            return (
+              <tr>
+                <td> {item.id}</td>
+                <td> {item.title}</td>
+                <td> {item.quantity}</td>
+              </tr>
+            )
+          })}
+        </tbody>
+      </table>
     </div>
   )
 }
