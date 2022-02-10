@@ -11,15 +11,6 @@ const db = mysql.createPool({
   database: 'inventory_db',
 })
 
-// Testing if connection is correct with mysql
-// app.get('/', (req, res) => {
-//   const sqlInsert =
-//     'INSERT INTO inventory_table (title, quantity) VALUES ("banana", 1)'
-//   db.query(sqlInsert, (err, result) => {
-//     res.send(err)
-//   })
-// })
-
 app.use(cors())
 app.use(express.json())
 app.use(bodyParser.urlencoded({ extended: true }))
@@ -38,6 +29,35 @@ app.post('/api/insert', (req, res) => {
   const sqlInsert = 'INSERT INTO inventory_table (title, quantity) VALUES (?,?)'
   db.query(sqlInsert, [itemName, itemQuantity], (err, result) => {
     console.log(result)
+  })
+})
+
+app.delete('/api/delete/:id', (req, res) => {
+  const id = req.params.id
+  const sqlDelete = `DELETE FROM inventory_table WHERE id = ?`
+
+  db.query(sqlDelete, id, (error, result) => {
+    if (error) console.log(error)
+  })
+})
+
+//Increment
+app.put('/api/update/increment/:id', (req, res) => {
+  const name = req.params.id
+  const sqlUpdate = `UPDATE inventory_table SET quantity = quantity + 1 WHERE id = ?`
+
+  db.query(sqlUpdate, name, (error, result) => {
+    if (error) console.log(error)
+  })
+})
+
+//Decrement
+app.put('/api/update/decrement/:id', (req, res) => {
+  const name = req.params.id
+  const sqlUpdate = `UPDATE inventory_table SET quantity = quantity - 1 WHERE id = ?`
+
+  db.query(sqlUpdate, name, (error, result) => {
+    if (error) console.log(error)
   })
 })
 
