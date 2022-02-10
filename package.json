@@ -6,7 +6,9 @@
   "scripts": {
     "server": "npm run server --prefix server",
     "client": "npm run start --prefix client",
-    "start": "concurrently \"npm run server\" \"npm run client\""
+    "start": "concurrently \"npm run server\" \"npm run client\"",
+    "install-all-windows": "(npm install) && (cd client && npm install) && (cd ../server && npm install)",
+    "install-all-mac": "(npm install) ; (cd client && npm install) ; (cd ../server && npm install)"
   },
   "repository": {
     "type": "git",
