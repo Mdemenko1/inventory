@@ -40,6 +40,13 @@ Enjoy!
 
 Server: localhost
 Username: root
-Password: password
+Password: (same password as your user have for local host connection in any SQL program)
+
+```
+
+You can access the email notifications here : https://mailtrap.io/signin
+
+email: inventoryappctd@gmail.com
+password : codethedream2020
 
 ```

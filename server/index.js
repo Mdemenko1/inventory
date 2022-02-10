@@ -6,16 +6,19 @@ const app = express()
 const mysql = require('mysql')
 const nodemailer = require('nodemailer')
 
+//Connection to the database
 const db = mysql.createPool({
   connectionLimit: 10,
   host: 'localhost',
   user: 'root',
-  password: 'mayla2020',
+  password: '', //same password as your user have for local host connection in any SQL program 
 })
 
+//Check if the database inventory_db already exist
 db.query('CREATE DATABASE IF NOT EXISTS inventory_db', function (err, result) {
   if (err) throw err
 
+ //First time creating tabel for the inventory items, specifing the type of the data
   db.query(
     `CREATE TABLE IF NOT EXISTS inventory_db.inventory_table (
     id INT NOT NULL AUTO_INCREMENT,
@@ -39,6 +42,7 @@ app.use(cors())
 app.use(express.json())
 app.use(bodyParser.urlencoded({ extended: true }))
 
+//Get request, to get the inventory table data
 app.get('/api/get', (req, res) => {
   const sqlSelect = 'Select * FROM inventory_db.inventory_table'
   db.query(sqlSelect, (err, result) => {
@@ -46,6 +50,7 @@ app.get('/api/get', (req, res) => {
   })
 })
 
+//inserting to the table through the post request
 app.post('/api/insert', (req, err) => {
   const itemName = req.body.itemName
   const itemQuantity = req.body.itemQuantity
@@ -60,7 +65,7 @@ app.post('/api/insert', (req, err) => {
     })
   }
 })
-
+//Api request to delete the item from the inventory table
 app.delete('/api/delete/:id', (req, res) => {
   const id = req.params.id
   const sqlDelete = `DELETE FROM inventory_db.inventory_table WHERE id = ?`
@@ -84,7 +89,7 @@ app.delete('/api/deleteinventory', (res) => {
   })
 })
 
-//Increment
+//Increment the quantity of the item based on the id received from html
 app.put('/api/update/increment/:id', (req, res) => {
   const name = req.params.id
   const sqlUpdate = `UPDATE inventory_db.inventory_table SET quantity = quantity + 1 WHERE id = ?`
@@ -94,7 +99,7 @@ app.put('/api/update/increment/:id', (req, res) => {
   })
 })
 
-//Decrement
+//Decrement the quantity of the item based on the id received from html
 app.put('/api/update/decrement/:id', (req, res) => {
   const id = req.params.id
   const sqlUpdate = `UPDATE inventory_db.inventory_table SET quantity = quantity - 1 WHERE id = ?`
@@ -108,6 +113,8 @@ app.put('/api/update/decrement/:id', (req, res) => {
   db.query(sqlItemQuantity, id, (error, result) => {
     if (error) console.log(error)
     else {
+
+      //Check for quantity left in the stock, if low -> send the email notification
       if (result[0].quantity === 1) {
         db.query(sqlItemName, id, (error, result) => {
           const dbItemTitle = [result[0].title]
