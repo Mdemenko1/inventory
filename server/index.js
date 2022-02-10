@@ -3,6 +3,7 @@ const bodyParser = require('body-parser')
 const cors = require('cors')
 const app = express()
 const mysql = require('mysql')
+const nodemailer = require('nodemailer')
 
 const db = mysql.createPool({
   host: 'localhost',
@@ -22,14 +23,18 @@ app.get('/api/get', (req, res) => {
   })
 })
 
-app.post('/api/insert', (req, res) => {
+app.post('/api/insert', (req, err) => {
   const itemName = req.body.itemName
   const itemQuantity = req.body.itemQuantity
 
   const sqlInsert = 'INSERT INTO inventory_table (title, quantity) VALUES (?,?)'
-  db.query(sqlInsert, [itemName, itemQuantity], (err, result) => {
-    console.log(result)
-  })
+  if (itemQuantity === 0) console.log('Item Quantity need to be a minimum of 1')
+  else {
+    db.query(sqlInsert, [itemName, itemQuantity], (err, result) => {
+      if (err) console.log(err)
+      console.log(result)
+    })
+  }
 })
 
 app.delete('/api/delete/:id', (req, res) => {
@@ -42,13 +47,18 @@ app.delete('/api/delete/:id', (req, res) => {
 })
 
 // delete all inventory
-// app.delete('/api/deleteinventory', (res) => {
-//   const sqlDeleteInventory = `DELETE FROM inventory_table`
+app.delete('/api/deleteinventory', (res) => {
+  const sqlDeleteInventory = `DELETE FROM inventory_table`
+  const sqlResetTable = `ALTER TABLE inventory_table AUTO_INCREMENT = 1;`
 
-//   db.query(sqlDeleteInventory, (error) => {
-//     if (error) console.log(error)
-//   })
-// })
+  db.query(sqlDeleteInventory, (error) => {
+    if (error) console.log(error)
+  })
+
+  db.query(sqlResetTable, (error) => {
+    if (error) console.log(error)
+  })
+})
 
 //Increment
 app.put('/api/update/increment/:id', (req, res) => {
@@ -62,11 +72,64 @@ app.put('/api/update/increment/:id', (req, res) => {
 
 //Decrement
 app.put('/api/update/decrement/:id', (req, res) => {
-  const name = req.params.id
+  const id = req.params.id
   const sqlUpdate = `UPDATE inventory_table SET quantity = quantity - 1 WHERE id = ?`
+  const sqlItemName = `SELECT title FROM inventory_table WHERE id = ?`
+  const sqlItemQuantity = `SELECT quantity FROM inventory_table WHERE id = ?`
 
-  db.query(sqlUpdate, name, (error, result) => {
+  db.query(sqlUpdate, id, (error, result) => {
     if (error) console.log(error)
+  })
+
+  db.query(sqlItemQuantity, id, (error, result) => {
+    if (error) console.log(error)
+    else {
+      if (result[0].quantity === 1) {
+        db.query(sqlItemName, id, (error, result) => {
+          const dbItemTitle = [result[0].title]
+          if (error) console.log(error)
+
+          // Nodemailer initialization connected to Mailtrap.io
+          var transport = nodemailer.createTransport({
+            host: 'smtp.mailtrap.io',
+            port: 2525,
+            auth: {
+              user: 'c22b9d9b627b32',
+              pass: 'fe9ca3c9139a98',
+            },
+          })
+
+          // Email template
+          const output = `
+          <p>Hello,</p>
+          <p>Item <strong>${dbItemTitle} </strong> currently is out of stock. Please accept our apologies for this inconvenience.</p>
+          <p> Sincerely</p>
+          <p> Inventory Tracking App Team</p>
+          `
+          // Email information
+          var mailOptions = {
+            from: 'inventoryappctd@gmail.com',
+            to: 'example@gmail.com',
+            subject: `Inventory Tracking App Notification: Item ${dbItemTitle} is out of stock.`,
+            html: output,
+          }
+
+          // Send email
+          transport.sendMail(mailOptions, function (error, info) {
+            if (error) {
+              console.log(error)
+            } else {
+              console.log(
+                'Email sent to: ' +
+                  info.envelope.to +
+                  ' Subject: ' +
+                  mailOptions.subject
+              )
+            }
+          })
+        })
+      }
+    }
   })
 })
 
