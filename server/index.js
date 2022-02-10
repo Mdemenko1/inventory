@@ -1,3 +1,4 @@
+const util = require('util')
 const express = require('express')
 const bodyParser = require('body-parser')
 const cors = require('cors')
@@ -6,18 +7,40 @@ const mysql = require('mysql')
 const nodemailer = require('nodemailer')
 
 const db = mysql.createPool({
+  connectionLimit: 10,
   host: 'localhost',
   user: 'root',
   password: 'mayla2020',
-  database: 'inventory_db',
 })
+
+db.query('CREATE DATABASE IF NOT EXISTS inventory_db', function (err, result) {
+  if (err) throw err
+
+  db.query(
+    `CREATE TABLE IF NOT EXISTS inventory_db.inventory_table (
+    id INT NOT NULL AUTO_INCREMENT,
+    title VARCHAR(45) NOT NULL,
+    quantity INT UNSIGNED NOT NULL,
+    PRIMARY KEY (id));
+  `,
+    function (err, result) {
+      if (err) throw err
+
+      console.log('inventory_table table created')
+    }
+  )
+  console.log('inventory_db database created')
+})
+
+// Promisify for Node.js async/await.
+db.query = util.promisify(db.query)
 
 app.use(cors())
 app.use(express.json())
 app.use(bodyParser.urlencoded({ extended: true }))
 
 app.get('/api/get', (req, res) => {
-  const sqlSelect = 'Select * FROM inventory_table'
+  const sqlSelect = 'Select * FROM inventory_db.inventory_table'
   db.query(sqlSelect, (err, result) => {
     res.send(result)
   })
@@ -27,7 +50,8 @@ app.post('/api/insert', (req, err) => {
   const itemName = req.body.itemName
   const itemQuantity = req.body.itemQuantity
 
-  const sqlInsert = 'INSERT INTO inventory_table (title, quantity) VALUES (?,?)'
+  const sqlInsert =
+    'INSERT INTO inventory_db.inventory_table (title, quantity) VALUES (?,?)'
   if (itemQuantity === 0) console.log('Item Quantity need to be a minimum of 1')
   else {
     db.query(sqlInsert, [itemName, itemQuantity], (err, result) => {
@@ -39,7 +63,7 @@ app.post('/api/insert', (req, err) => {
 
 app.delete('/api/delete/:id', (req, res) => {
   const id = req.params.id
-  const sqlDelete = `DELETE FROM inventory_table WHERE id = ?`
+  const sqlDelete = `DELETE FROM inventory_db.inventory_table WHERE id = ?`
 
   db.query(sqlDelete, id, (error, result) => {
     if (error) console.log(error)
@@ -48,8 +72,8 @@ app.delete('/api/delete/:id', (req, res) => {
 
 // delete all inventory
 app.delete('/api/deleteinventory', (res) => {
-  const sqlDeleteInventory = `DELETE FROM inventory_table`
-  const sqlResetTable = `ALTER TABLE inventory_table AUTO_INCREMENT = 1;`
+  const sqlDeleteInventory = `DELETE FROM inventory_db.inventory_table`
+  const sqlResetTable = `ALTER TABLE inventory_db.inventory_table AUTO_INCREMENT = 1;`
 
   db.query(sqlDeleteInventory, (error) => {
     if (error) console.log(error)
@@ -63,7 +87,7 @@ app.delete('/api/deleteinventory', (res) => {
 //Increment
 app.put('/api/update/increment/:id', (req, res) => {
   const name = req.params.id
-  const sqlUpdate = `UPDATE inventory_table SET quantity = quantity + 1 WHERE id = ?`
+  const sqlUpdate = `UPDATE inventory_db.inventory_table SET quantity = quantity + 1 WHERE id = ?`
 
   db.query(sqlUpdate, name, (error, result) => {
     if (error) console.log(error)
@@ -73,9 +97,9 @@ app.put('/api/update/increment/:id', (req, res) => {
 //Decrement
 app.put('/api/update/decrement/:id', (req, res) => {
   const id = req.params.id
-  const sqlUpdate = `UPDATE inventory_table SET quantity = quantity - 1 WHERE id = ?`
-  const sqlItemName = `SELECT title FROM inventory_table WHERE id = ?`
-  const sqlItemQuantity = `SELECT quantity FROM inventory_table WHERE id = ?`
+  const sqlUpdate = `UPDATE inventory_db.inventory_table SET quantity = quantity - 1 WHERE id = ?`
+  const sqlItemName = `SELECT title FROM inventory_db.inventory_table WHERE id = ?`
+  const sqlItemQuantity = `SELECT quantity FROM inventory_db.inventory_table WHERE id = ?`
 
   db.query(sqlUpdate, id, (error, result) => {
     if (error) console.log(error)

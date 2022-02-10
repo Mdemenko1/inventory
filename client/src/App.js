@@ -4,9 +4,7 @@ import Axios from 'axios'
 
 function App() {
   const [itemName, setItemName] = useState('')
-  const [itemQuantity, setItemQuantity] = useState()
-  // const [increment, setIncrement] = useState()
-
+  const [itemQuantity, setItemQuantity] = useState('')
   const [itemList, setItemList] = useState([])
 
   useEffect(() => {
@@ -15,22 +13,26 @@ function App() {
     })
   })
 
-  const createItem = () => {
+  const createItem = (event) => {
+    event.preventDefault()
     Axios.post('http://localhost:3001/api/insert', {
       itemName: itemName,
-      itemQuantity: itemQuantity,
+      itemQuantity: parseInt(itemQuantity),
     }).then(() => {
       alert('successful insert')
     })
+    setItemName('')
+    setItemQuantity('')
   }
 
   const deleteItem = (id) => {
     Axios.delete(`http://localhost:3001/api/delete/${id}`)
   }
 
-  // const deleteInventory = () => {
-  //   Axios.delete(`http://localhost:3001/api/deleteinventory`)
-  // }
+  const deleteInventory = (event) => {
+    event.preventDefault()
+    Axios.delete(`http://localhost:3001/api/deleteinventory`)
+  }
 
   const increment = (id) => {
     Axios.put(`http://localhost:3001/api/update/increment/${id}`)
@@ -41,13 +43,16 @@ function App() {
   }
 
   return (
-    <div className="container text-center btn-border mt-5">
+    <div className="container text-center btn-border mt-5 bg-light-purple">
       <h1 className="mt-5 text-purple">Inventory Tracking App</h1>
       <h5>Create new item:</h5>
-      <form className="form d-flex flex-column col-3 mx-auto mb-3">
+      <form
+        className="form d-flex flex-column col-3 mx-auto mb-3"
+        onSubmit={(e) => createItem(e)}
+      >
         <input
           type="text"
-          name="itemName"
+          value={itemName}
           onChange={(event) => {
             setItemName(event.target.value)
           }}
@@ -57,7 +62,8 @@ function App() {
         />
         <input
           type="number"
-          name="itemQuantity"
+          value={itemQuantity}
+          min="1"
           onChange={(event) => {
             setItemQuantity(event.target.value)
           }}
@@ -67,7 +73,6 @@ function App() {
         />
         <button
           type="submit"
-          onClick={createItem}
           className="btn btn-outline-purple btn-border mt-2"
         >
           Create
@@ -91,10 +96,14 @@ function App() {
             <tbody>
               {itemList.map((item) => {
                 return (
-                  <tr>
+                  <tr key={item.id}>
                     <td> {item.id}</td>
-                    <td> {item.title}</td>
-                    <td> {item.quantity}</td>
+                    <td className="text-capitalize"> {item.title}</td>
+                    {item.quantity === 0 ? (
+                      <td>Out of stock</td>
+                    ) : (
+                      <td>{item.quantity}</td>
+                    )}
                     <td>
                       <button
                         onClick={() => increment(item.id)}
@@ -124,15 +133,15 @@ function App() {
               })}
             </tbody>
           </table>
-          {/* <form>
+
+          <form onSubmit={deleteInventory}>
             <button
               type="submit"
-              onClick={deleteInventory()}
-              className="btn btn-small btn-outline-danger mt-4 mx-auto"
+              className="btn btn-small btn-outline-danger my-4 mx-auto"
             >
               Delete all inventory
             </button>
-          </form> */}
+          </form>
         </>
       )}
     </div>
