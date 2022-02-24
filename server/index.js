@@ -11,14 +11,14 @@ const db = mysql.createPool({
   connectionLimit: 10,
   host: 'localhost',
   user: 'root',
-  password: '', //same password as your user have for local host connection in any SQL program 
+  password: 'Mayla2020', //same password as your user have for local host connection in any SQL program
 })
 
 //Check if the database inventory_db already exist
 db.query('CREATE DATABASE IF NOT EXISTS inventory_db', function (err, result) {
   if (err) throw err
 
- //First time creating tabel for the inventory items, specifing the type of the data
+  //First time creating tabel for the inventory items, specifing the type of the data
   db.query(
     `CREATE TABLE IF NOT EXISTS inventory_db.inventory_table (
     id INT NOT NULL AUTO_INCREMENT,
@@ -113,7 +113,6 @@ app.put('/api/update/decrement/:id', (req, res) => {
   db.query(sqlItemQuantity, id, (error, result) => {
     if (error) console.log(error)
     else {
-
       //Check for quantity left in the stock, if low -> send the email notification
       if (result[0].quantity === 1) {
         db.query(sqlItemName, id, (error, result) => {

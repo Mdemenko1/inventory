@@ -21,6 +21,7 @@
   },
   "homepage": "https://github.com/Mdemenko1/inventory#readme",
   "dependencies": {
-    "concurrently": "^7.0.0"
+    "concurrently": "^7.0.0",
+    "react-router-dom": "^6.2.1"
   }
 }
